@@ -5,9 +5,7 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-// Connect MongoDB
-mongoose.connect("mongodb://localhost:27017/crm")
+mongoose.connect("mongodb+srv://crmuser:crm12345@cluster0.kfjadot.mongodb.net/crm")
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log("DB Error:", err));
 
