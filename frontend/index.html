@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CRM Task System</title>
+</head>
+<body>
+
+<h2>Create Task</h2>
+
+<input id="title" placeholder="Title"><br><br>
+<input id="description" placeholder="Description"><br><br>
+<input id="assignedTo" placeholder="Assign To"><br><br>
+<input id="assignedBy" placeholder="Assigned By"><br><br>
+
+<button onclick="createTask()">Create Task</button>
+
+<hr>
+
+<h2>All Tasks</h2>
+<div id="tasks"></div>
+
+<script>
+const API = "http://localhost:5000";
+
+async function createTask() {
+  await fetch(API + "/tasks", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      title: document.getElementById("title").value,
+      description: document.getElementById("description").value,
+      assignedTo: document.getElementById("assignedTo").value,
+      assignedBy: document.getElementById("assignedBy").value
+    })
+  });
+
+  loadTasks();
+}
+
+async function loadTasks() {
+  const res = await fetch(API + "/tasks");
+  const data = await res.json();
+
+  document.getElementById("tasks").innerHTML = data.map(t => `
+    <div style="border:1px solid #000; padding:10px; margin:10px;">
+      <b>${t.title}</b><br>
+      ${t.description}<br>
+      Assigned To: ${t.assignedTo}<br>
+      Status: ${t.status}<br>
+
+      <input placeholder="Add remarks" id="r-${t._id}">
+      <button onclick="completeTask('${t._id}')">Mark Completed</button>
+    </div>
+  `).join("");
+}
+
+async function completeTask(id) {
+  const remarks = document.getElementById("r-" + id).value;
+
+  await fetch(API + "/tasks/" + id + "/complete", {
+    method: "PUT",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ remarks })
+  });
+
+  loadTasks();
+}
+
+loadTasks();
+</script>
+
+</body>
+</html>
